@@ -1,0 +1,13 @@
+[% dometa = 'yes' %]
+<article class="content wrap">
+	<header>
+		<time datetime="[% date.format(article.timestamp, "%Y-%m-%d") %]">[% article.attrs.dated %]</time>
+		<h1>[% article.attrs.title %][% if article.attrs.subtitle %]<p>[% article.attrs.subtitle %]</p>[% end %]</h1>
+	</header>
+	<ul class="social">
+		<li class="fb"></li>
+		<li class="tw"></li>
+		<li class="gg"></li>
+	</ul>
+	[% article.attrs.body %]
+</article>

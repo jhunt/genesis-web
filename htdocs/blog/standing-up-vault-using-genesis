@@ -1,0 +1,169 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Genesis :: A BOSH Deployment Paradigm :: Stark &amp; Wayne</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" type="text/css">
+<link href="/css/style.css" rel="stylesheet" type="text/css" media="all" />
+<!--start slider -->
+    <link rel="stylesheet" href="/css/fwslider.css" media="all">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery-ui.min.js"></script>
+    <script src="/js/css3-mediaqueries.js"></script>
+    <script src="/js/fwslider.js"></script>
+<!--end slider -->
+<script type="text/javascript" src="/js/jquery-hover-effect.js"></script>
+<script type="text/javascript">
+//Image Hover
+jQuery(document).ready(function(){
+	jQuery(function() {
+		jQuery('ul.da-thumbs > li').hoverdir();
+	});
+});
+<!--nav-->
+<script type="text/javascript">
+	$(function() {
+		var pull 		= $('#pull');
+			menu 		= $('nav ul');
+			menuHeight	= menu.height();
+
+		$(pull).on('click', function(e) {
+			e.preventDefault();
+			menu.slideToggle();
+		});
+
+		$(window).resize(function(){
+			var w = $(window).width();
+			if(w > 320 && menu.is(':hidden')) {
+				menu.removeAttr('style');
+			}
+		});
+	});
+</script>
+</head>
+<body>
+<div class="header_bg">
+	<div class="wrap">
+		<div class="header">
+			<div class="logo">
+				<a href="/"><img src="/images/logo.png" alt="" /></a>
+			</div>
+			<div class="cssmenu">
+				<ul>
+					<li class="active"><a href="/">Home</a></li>
+					<li><a href="/docs">Documentation</a></li>
+					<li><a href="https://github.com/starkandwayne/genesis">Code</a></li>
+					<li class="last"><a href="starkandwayne.html">Stark &amp; Wayne</a></li>
+					<div class="clear"></div>
+				</ul>
+			</div>
+			<div class="clear"></div>
+			<div class="top-nav">
+				<nav class="clearfix">
+					<ul>
+						<li><a href="/">Home</a></li>
+						<li><a href="/docs">Documentation</a></li>
+						<li><a href="https://github.com/starkandwayne/genesis">Code</a></li>
+						<li class="last"><a href="starkandwayne.html">Stark &amp; Wayne</a></li>
+					</ul>
+					<a href="#" id="pull">Menu</a>
+				</nav>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+</div><article class="content wrap">
+	<header>
+		<time datetime="">21 Jun 2016</time>
+		<h1>Standing Up Vault Using Genesis</h1>
+	</header>
+	<ul class="social">
+		<li class="fb"></li>
+		<li class="tw"></li>
+		<li class="gg"></li>
+	</ul><p>A few of our recent posts related to standing up BOSH deployments using <a href="https://github.com/starkandwayne/genesis">Genesis</a> have all revolved around needing <a href="https://vaultproject.io">Vault</a> to store your credentials safely. The <a href="https://github.com/cloudfoundry-community/vault-boshrelease">vault-boshrelease</a> makes this fairly straightforward, but there's now a <a href="https://github.com/starkandwayne/vault-deployment">Genesis Vault template</a> to make running Vault even easier!</p>
+
+<p>The procedure is similar to the other Genesis deployments:</p>
+
+<pre><code>$ genesis new deployment --template vault
+$ cd vault-deployments
+$ genesis new site --template bosh-lite macbook
+$ git add macbook; git commit -m "Added macbook site"
+$ bosh target bosh-lite
+$ genesis new env macbook sandbox
+$ cd macbook/sandbox
+$ make deploy
+$ git add .; git commit -m "Added initial sandbox environment"
+
+# lather, rinse, repeat as needed for all of your sites/environments
+</code></pre>
+
+<p>Out of the box, you get an HA Vault using Consul as its encrypted backend datastore.  However, to start using it, you will need to initialize your Vault. I recommend using the <a href="https://github.com/jhunt/safe/releases">safe</a> CLI for interacting with Vault:</p>
+
+<pre><code>$ safe target "https://&lt;vault ip:8200&gt;" macbook-vault
+$ safe vault init
+</code></pre>
+
+<p>This will output keys to use when unsealing the Vault, as well as the initial root user's password. Save these somewhere secure, as they <strong>will</strong> be needed any time the Vault process gets restarted.</p>
+
+<p>Next, we need to unseal the new Vault, using 3 distinct Unseal Keys from the list obtained during <code>safe vault init</code>:</p>
+
+<pre><code>$ safe vault unseal
+$ safe vault unseal
+$ safe vault unseal
+</code></pre>
+
+<p>Now that Vault is initialized and unsealed, you can log in and pre-populate the handshake value used by many Genesis templates to detect if Vault is available:</p>
+
+<pre><code>$ safe auth
+Authenticating against macbook-vault at http://10.244.9.3:8200
+Token:
+$ safe set secret/handshake initialized=true
+initialized: true
+$ safe tree
+.
+└── secret
+    └── handshake
+$ safe get secret/handshake
+\--- # secret/handshake
+initialized: "true"
+</code></pre>
+
+<p>Voila!</p></article><div class="footer_bg">
+<div class="wrap">
+	<div class="footer">
+		<div class="span_of_4">
+			<div class="span2_of_4">
+				<h2>Blog</h2>
+				<ul class="f_nav1">					<li><a href="/blog/standing-up-vault-using-genesis">Standing Up Vault Using Genesis</a></li>					<li><a href="/blog/using-genesis-to-deploy-cloud-foundry">Using Genesis to Deploy Cloud Foundry</a></li>					<li><a href="/blog/managing-multiple-bosh-environments-with-genesis">Managing Multiple BOSH Environments</a></li>				</ul>
+			</div>
+			<div class="span1_of_4">
+				<h2>Docs</h2>
+				<ul class="f_nav1">
+					<li><a href="/docs/getting-started">Getting Started</a></li>
+					<li><a href="/docs/faq">Why Genesis?</a></li>
+					<li><a href="/docs/runway">Pipelines &amp; Automation</a></li>
+				</ul>
+			</div>
+			<div class="span1_of_4">
+				<h2>Stark &amp; Wayne
+					<img src="/images/starkandwayne.png" style="float: right" /></h2>
+				<p class="f_para">
+					We provide world-class, top-tier consulting services
+					in deployment and automation of Cloud Foundry, Concourse and BOSH.
+				</p>
+			</div>
+			<div class="clear"></div>
+		</div>
+		<div class="footer_btm">
+		<div class="copy">
+			<p class="w3-link">Copyright 2016 <span><a href="https://starkandwayne.com">Stark & Wayne</a></span>.</p>
+		</div>
+		<div class="clear"></div>
+	</div>
+	</div>
+</div>
+</div>
+</body>
+</html>

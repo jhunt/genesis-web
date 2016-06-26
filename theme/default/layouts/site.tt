@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Genesis :: A BOSH Deployment Paradigm :: Stark &amp; Wayne</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" type="text/css">
+<link href="[% site.url %]/css/style.css" rel="stylesheet" type="text/css" media="all" />
+<!--start slider -->
+    <link rel="stylesheet" href="[% site.url %]/css/fwslider.css" media="all">
+    <script src="[% site.url %]/js/jquery.min.js"></script>
+    <script src="[% site.url %]/js/jquery-ui.min.js"></script>
+    <script src="[% site.url %]/js/css3-mediaqueries.js"></script>
+    <script src="[% site.url %]/js/fwslider.js"></script>
+<!--end slider -->
+<script type="text/javascript" src="[% site.url %]/js/jquery-hover-effect.js"></script>
+<script type="text/javascript">
+//Image Hover
+jQuery(document).ready(function(){
+	jQuery(function() {
+		jQuery('ul.da-thumbs > li').hoverdir();
+	});
+});
+<!--nav-->
+<script type="text/javascript">
+	$(function() {
+		var pull 		= $('#pull');
+			menu 		= $('nav ul');
+			menuHeight	= menu.height();
+
+		$(pull).on('click', function(e) {
+			e.preventDefault();
+			menu.slideToggle();
+		});
+
+		$(window).resize(function(){
+			var w = $(window).width();
+			if(w > 320 && menu.is(':hidden')) {
+				menu.removeAttr('style');
+			}
+		});
+	});
+</script>
+</head>
+<body>
+<div class="header_bg">
+	<div class="wrap">
+		<div class="header">
+			<div class="logo">
+				<a href="/"><img src="[% site.url %]/images/logo.png" alt="" /></a>
+			</div>
+			<div class="cssmenu">
+				<ul>
+					<li class="active"><a href="/">Home</a></li>
+					<li><a href="/docs">Documentation</a></li>
+					<li><a href="https://github.com/starkandwayne/genesis">Code</a></li>
+					<li class="last"><a href="starkandwayne.html">Stark &amp; Wayne</a></li>
+					<div class="clear"></div>
+				</ul>
+			</div>
+			<div class="clear"></div>
+			<div class="top-nav">
+				<nav class="clearfix">
+					<ul>
+						<li><a href="/">Home</a></li>
+						<li><a href="/docs">Documentation</a></li>
+						<li><a href="https://github.com/starkandwayne/genesis">Code</a></li>
+						<li class="last"><a href="starkandwayne.html">Stark &amp; Wayne</a></li>
+					</ul>
+					<a href="#" id="pull">Menu</a>
+				</nav>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+</div>
+[% content %]
+<div class="footer_bg">
+<div class="wrap">
+	<div class="footer">
+		<div class="span_of_4">
+			<div class="span2_of_4">
+				<h2>Blog</h2>
+				<ul class="f_nav1">
+					[% FOR post IN featured %]
+					<li><a href="[% site.url %]/blog/[% post.attrs.permalink %]">[% post.attrs.title %]</a></li>
+					[% END %]
+				</ul>
+			</div>
+			<div class="span1_of_4">
+				<h2>Docs</h2>
+				<ul class="f_nav1">
+					<li><a href="/docs/getting-started">Getting Started</a></li>
+					<li><a href="/docs/faq">Why Genesis?</a></li>
+					<li><a href="/docs/runway">Pipelines &amp; Automation</a></li>
+				</ul>
+			</div>
+			<div class="span1_of_4">
+				<h2>Stark &amp; Wayne
+					<img src="/images/starkandwayne.png" style="float: right" /></h2>
+				<p class="f_para">
+					We provide world-class, top-tier consulting services
+					in deployment and automation of Cloud Foundry, Concourse and BOSH.
+				</p>
+			</div>
+			<div class="clear"></div>
+		</div>
+		<div class="footer_btm">
+		<div class="copy">
+			<p class="w3-link">Copyright 2016 <span><a href="https://starkandwayne.com">Stark & Wayne</a></span>.</p>
+		</div>
+		<div class="clear"></div>
+	</div>
+	</div>
+</div>
+</div>
+</body>
+</html>

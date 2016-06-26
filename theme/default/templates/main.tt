@@ -1,0 +1,93 @@
+<!-- Slider -->
+<div id="fwslider">
+	<div class="slider_container">
+		<div class="slide">
+			<img src="[% site.url %]/images/slider1.jpg">
+			<div class="slide_content">
+				<div class="slide_content_wrap">
+					<h4 class="title">BOSH. Easy.</h4>
+					<p class="description">Get your BOSH deployments up and spinning today.</p>
+				</div>
+			</div>
+		</div>
+		<div class="slide">
+			<img src="[% site.url %]/images/slider2.jpg">
+			<div class="slide_content">
+				<div class="slide_content_wrap">
+					<h4 class="title">Let's Begin</h4>
+					<p class="description">Learn how Genesis can help you tame your multi-environment BOSH deployments.</p>
+				</div>
+			</div>
+		</div>
+		<!--/slide -->
+	</div>
+	<div class="timers"></div>
+	<div class="slidePrev"><span></span></div>
+	<div class="slideNext"><span></span></div>
+</div>
+
+
+<!-- 3-Column Teaser -->
+<div class="main_bg">
+	<div class="wrap">
+		<div class="grids_1_of_3">
+			<div class="grid_1_of_3 images_1_of_3">
+				<img src="[% site.url %]/images/icon1.png" alt="" />
+				<a href="#"><h3>flexibility</h3></a>
+				<p>Leveraging <a href="https://spruce.cf">Spruce</a>, Genesis affords you and your operations team unprecedented flexibility in tailoring environment-specific configuration, while still being able to rely on a base of best practices.</p>
+			</div>
+			<div class="grid_1_of_3 images_1_of_3">
+				<img src="[% site.url %]/images/icon2.png" alt="" />
+				<a href="#"><h3>cloud-native</h3></a>
+				<p>Genesis grew up on The Cloud&trade; and knows how things work in this new world order.  It comes with templates for deploying BOSH, Cloud Foundry, Diego, CF Service Brokers and more.</p>
+			</div>
+			<div class="grid_1_of_3 images_1_of_3">
+				<img src="[% site.url %]/images/icon3.png" alt="" />
+				<a href="#"><h3>automation</h3></a>
+				<p>Using <a href="https://concourse-ci.com">Concourse</a>, Genesis can build automation workflows and pipelines to deploy configuration changes and security patches to all of your environments, in a controlled and tested fashion.</p>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+</div>
+
+
+<!-- Recent Blog Posts -->
+<div class="btm_grid_bg">
+	<div class="wrap">
+		<div class="btm_grid">
+			<h2>Recent Blog Posts</h2>
+			<div class="span_of_3">
+				[% FOR article IN featured %]
+				[% LAST if article.index() == 3 %]
+				<div class="span1_of_3">
+					<!-- 390x200 -->
+					<a href="[% site.url %]/blog/[% article.uuid %]"><img src="[% site.url %]/content/blog/[% article.attrs.thumb %].jpg" alt=""/></a>
+					<a href="[% site.url %]/blog/[% article.uuid %]"><h3>[% article.attrs.title %]</h3></a>
+					<h4 class="divider"></h4>
+					[% article.attrs.teaser %]
+				</div>
+				[% END %]
+				<div class="clear"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- Trailer Teaser -->
+<div class="mid_grid_bg">
+	<div class="wrap">
+		<div class="mid_grid">
+			<div class="mid_grid_left">
+				<h2>Got a BOSH-lite and 10 minutes?</h2>
+				<h3>you too can get started with genesis!</h3>
+				<a href="/docs/getting-started" class="btn">get started</a>
+			</div>
+			<div class="mid_grid_right">
+				<img src="[% site.url %]/images/banner.jpg" alt=""/>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+</div>

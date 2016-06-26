@@ -1,0 +1,58 @@
+# vim:ft=markdown
+title: Standing Up Vault Using Genesis
+format: markdown
+permalink: standing-up-vault-using-genesis
+author: Geoff Franks
+featured: yes
+dated: 21 Jun 2016
+thumb: keys
+--- |-
+Genesis BOSH deployments often require a Vault in which to safely store
+credentials.  Vault has a BOSH release, which now has a Genesis template to
+make getting up and running smoother than ever!
+--- |-
+A few of our recent posts related to standing up BOSH deployments using [Genesis](https://github.com/starkandwayne/genesis) have all revolved around needing [Vault](https://vaultproject.io) to store your credentials safely. The [vault-boshrelease](https://github.com/cloudfoundry-community/vault-boshrelease) makes this fairly straightforward, but there's now a [Genesis Vault template](https://github.com/starkandwayne/vault-deployment) to make running Vault even easier!
+
+The procedure is similar to the other Genesis deployments:
+
+    $ genesis new deployment --template vault
+    $ cd vault-deployments
+    $ genesis new site --template bosh-lite macbook
+    $ git add macbook; git commit -m "Added macbook site"
+    $ bosh target bosh-lite
+    $ genesis new env macbook sandbox
+    $ cd macbook/sandbox
+    $ make deploy
+    $ git add .; git commit -m "Added initial sandbox environment"
+
+    # lather, rinse, repeat as needed for all of your sites/environments
+
+Out of the box, you get an HA Vault using Consul as its encrypted backend datastore.  However, to start using it, you will need to initialize your Vault. I recommend using the [safe](https://github.com/jhunt/safe/releases) CLI for interacting with Vault:
+
+    $ safe target "https://<vault ip:8200>" macbook-vault
+    $ safe vault init
+
+This will output keys to use when unsealing the Vault, as well as the initial root user's password. Save these somewhere secure, as they **will** be needed any time the Vault process gets restarted.
+
+Next, we need to unseal the new Vault, using 3 distinct Unseal Keys from the list obtained during `safe vault init`:
+
+    $ safe vault unseal
+    $ safe vault unseal
+    $ safe vault unseal
+
+Now that Vault is initialized and unsealed, you can log in and pre-populate the handshake value used by many Genesis templates to detect if Vault is available:
+
+    $ safe auth
+    Authenticating against macbook-vault at http://10.244.9.3:8200
+    Token:
+    $ safe set secret/handshake initialized=true
+    initialized: true
+    $ safe tree
+    .
+    └── secret
+        └── handshake
+    $ safe get secret/handshake
+    \--- # secret/handshake
+    initialized: "true"
+
+Voila!

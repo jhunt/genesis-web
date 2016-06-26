@@ -1,0 +1,229 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Genesis :: A BOSH Deployment Paradigm :: Stark &amp; Wayne</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" type="text/css">
+<link href="/css/style.css" rel="stylesheet" type="text/css" media="all" />
+<!--start slider -->
+    <link rel="stylesheet" href="/css/fwslider.css" media="all">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery-ui.min.js"></script>
+    <script src="/js/css3-mediaqueries.js"></script>
+    <script src="/js/fwslider.js"></script>
+<!--end slider -->
+<script type="text/javascript" src="/js/jquery-hover-effect.js"></script>
+<script type="text/javascript">
+//Image Hover
+jQuery(document).ready(function(){
+	jQuery(function() {
+		jQuery('ul.da-thumbs > li').hoverdir();
+	});
+});
+<!--nav-->
+<script type="text/javascript">
+	$(function() {
+		var pull 		= $('#pull');
+			menu 		= $('nav ul');
+			menuHeight	= menu.height();
+
+		$(pull).on('click', function(e) {
+			e.preventDefault();
+			menu.slideToggle();
+		});
+
+		$(window).resize(function(){
+			var w = $(window).width();
+			if(w > 320 && menu.is(':hidden')) {
+				menu.removeAttr('style');
+			}
+		});
+	});
+</script>
+</head>
+<body>
+<div class="header_bg">
+	<div class="wrap">
+		<div class="header">
+			<div class="logo">
+				<a href="/"><img src="/images/logo.png" alt="" /></a>
+			</div>
+			<div class="cssmenu">
+				<ul>
+					<li class="active"><a href="/">Home</a></li>
+					<li><a href="/docs">Documentation</a></li>
+					<li><a href="https://github.com/starkandwayne/genesis">Code</a></li>
+					<li class="last"><a href="starkandwayne.html">Stark &amp; Wayne</a></li>
+					<div class="clear"></div>
+				</ul>
+			</div>
+			<div class="clear"></div>
+			<div class="top-nav">
+				<nav class="clearfix">
+					<ul>
+						<li><a href="/">Home</a></li>
+						<li><a href="/docs">Documentation</a></li>
+						<li><a href="https://github.com/starkandwayne/genesis">Code</a></li>
+						<li class="last"><a href="starkandwayne.html">Stark &amp; Wayne</a></li>
+					</ul>
+					<a href="#" id="pull">Menu</a>
+				</nav>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+</div><article class="content wrap">
+	<header>
+		<time datetime="">8 Jun 2016</time>
+		<h1>Using Genesis to Deploy Cloud Foundry</h1>
+	</header>
+	<ul class="social">
+		<li class="fb"></li>
+		<li class="tw"></li>
+		<li class="gg"></li>
+	</ul><p>In this post, we're going to use <a href="https://github.com/starkandwayne/genesis">Genesis</a> to deploy <a href="https://github.com/cloudfoundry/cf-release">Cloud Foundry</a>. We will make use of some of Genesis's cool features to generate unique credentials for each deployment, and <a href="https://vaultproject.io">Vault</a> to keep the credentials out of the saved manifests. We will do this on BOSH-Lite, but templates exist to easily deploy to AWS with a nearly identical process (AWS will require a couple more parameters to be defined).</p>
+
+<h2>Prerequisites</h2>
+
+<p>These instructions assume that you have a working installation of <a href="https://github.com/cloudfoundry/bosh-lite">BOSH-Lite</a>, and <a href="https://github.com/cloudfoundry-community/vault-boshrelease">Vault</a>. It also assumes you have set the VAULT_ADDR environment variable, and successfully authenticated to an unsealed Vault. The <a href="https://github.com/cloudfoundry-community/vault-boshrelease">vault-boshrelease</a> has some good instructions on getting this up and running quickly. Additionally, the <a href="https://github.com/geofffranks/spruce">Spruce</a>, <a href="https://github.com/jhunt/safe">Safe</a>, and <a href="https://github.com/square/certstrap">certstrap</a> command line utilities are required.</p>
+
+<h2>Getting Started</h2>
+
+<p>First, we will use Genesis to create a new repo for managing our Cloud Foundry deployments:</p>
+
+<pre><code>genesis new deployment --template cf
+</code></pre>
+
+<p>This will create a git repository in the current working directory called <code>cf-deployments</code>. This repo will be what you use to manage all of your Cloud Foundry deployments, using the Genesis templates. An <code>upstream</code> remote is created automatically to track changes to the original templates, allowing you to easily pull in updates that are made to it over time.</p>
+
+<p>Secondly, we will create a new <a href="https://github.com/starkandwayne/genesis#genesis---a-bosh-deployment-paradigm">site</a> for BOSH-Lite:</p>
+
+<pre><code>$ cd cf-deployments
+$ genesis new site --template bosh-lite macbook
+</code></pre>
+
+<p>This creates a new <strong>site</strong> directory in the <code>cf-deployments</code> repo, called <code>macbook</code>, based on the <code>bosh-lite</code> site templates. As of the time this post was written, both <code>bosh-lite</code> and <code>aws</code> site templates were provided, but more may now exist. If not, you can create your own, and hopefully submitting an upstream pull request, so others can make use of your work.</p>
+
+<p>Third, create a new <a href="https://github.com/starkandwayne/genesis#genesis---a-bosh-deployment-paradigm">environment</a> in our <code>my-site</code> site:</p>
+
+<pre><code>genesis new environment my-site my-env
+</code></pre>
+
+<p>This creates a <code>sandbox</code> directory representing the environment inside the <code>cf-deployments/macbook</code> site directory. It also does a couple nifty things under the hood that are not immediately apparent:</p>
+
+<ol>
+<li>It runs any scripts in <code>cf-deployments/.env_hooks</code>. In this case, there are scripts which will connect to your Vault installation and generate unique secrets/certificates/keys for your Cloud Foundry deployment. Each time you create a new environment, these credentials will be unique, decreasing the risks of environments accidentally communicating with one-another.</li>
+<li>It will generate a logical name for your bosh deployment, based on the type of deployment being done (cf), site (macbook), and environment (sandbox): <code>macbook-sandbox-cf</code></li>
+<li>It grabs the UUID of the currently targeted BOSH director, and inserts that to <code>director.yml</code>, so you don't have to.</li>
+</ol>
+
+<p>Next, we will attempt to deploy, to see if there are any parameters need to be filled out to get our environment deployed:</p>
+
+<pre><code>$ cd macbook/sandbox
+$ make deploy
+Refreshing site definitions for macbook/sandbox
+Refreshing global definitions for macbook/sandbox
+4 error(s) detected:
+ - $.networks.cf.subnets: Specify the subnet to use for CF
+ - $.properties.cc.security_group_definitions.load_balancer.rules: Specify the rules for allowing access for CF apps to talk to the CF Load Balancer External IPs
+ - $.properties.cc.security_group_definitions.services.rules: Specify the rules for allowing access to CF services subnets
+ - $.properties.cc.security_group_definitions.user_bosh_deployments.rules: Specify the rules for additional BOSH user services that apps will need to talk to
+
+
+Failed to merge templates; bailing...
+make: *** [manifest] Error 5
+</code></pre>
+
+<p>It looks like we need to provide some configuration for the network setup this Cloud Foundry will run on. Let's use this, to match what the traditional Cloud Foundry on BOSH-Lite will look like:</p>
+
+<pre><code>$ cat &lt;&lt;EOF &gt; networking.yml
+networks:
+- name: cf
+  subnets:
+  - gateway: 10.244.0.1
+    range: 10.244.0.0/24
+    static:
+    - 10.244.0.2 - 10.244.0.100
+
+properties:
+  cc:
+    security_group_definitions:
+    - name: services
+      rules:
+      - destination: 10.244.0.0 - 10.244.1.255
+        protocol: all
+    - name: load_balancer
+      rules:
+      - destination: 10.244.0.34
+        protocol: all
+    - name: user_bosh_deployments
+      rules:
+      - destination: 10.244.0.0 - 10.244.255.255
+        protocol: all
+EOF
+</code></pre>
+
+<p>Now that that's taken care of, let's try again:</p>
+
+<pre><code>$ make refresh deploy
+Refreshing site definitions for macbook/sandbox
+Refreshing global definitions for macbook/sandbox
+&lt;output omitted for brevity - it's deploying a full CF to bosh-lite, after all&gt;
+</code></pre>
+
+<p>Since there were no errors generating the manifest, Genesis moves on to deploying Cloud Foundry. Now take a look at the generated manifest in <code>cf-deployments/macbook/sandbox/manifests/manifest.yml</code>, and look for the certs and passwords. You will see that they're all <code>REDACTED</code>. Genesis tells Spruce to redact credentials from Vault except in the manifest that is actively being deployed via BOSH (which is cleaned up immediately after). This greatly minimizes the risk that sensitive credentials might be committed into your repo, and accidentally leaked to unauthorized eyes.</p>
+
+<p>To find the credentials that were generated for the deployment, you can use <code>safe tree secret/macbook/sandbox/cf</code> to see where the creds are stored and <code>safe get &lt;path&gt;</code> to retrieve them for use with <code>cf login</code> or <code>nats</code></p>
+
+<p>Finally, shout out to <code>@starkandwayne</code> with the <code>#genesis</code> hashtag to let us know you love genesis!</p>
+
+<h2>The Long Term Scenario</h2>
+
+<p>When living with this in a real world scenario, you will inevitably need to make modifications and upgrades over time and across a variety of environments. Genesis makes this really easy to manage, since the global and site templates are shared across all your deployments. Many changes you make will go from <code>write-once-per-deployment-hoping-you-applied-all-the-changes-correctly, deploy-many</code> to <code>write-once, deploy-many</code>.</p>
+
+<p>The workflow goes something like this:</p>
+
+<ol>
+<li>Edit the applicable files in <code>cf-deployments/global</code>, <code>cf-deployments/&lt;site&gt;/site</code> or <code>cf-deployments/&lt;site&gt;/&lt;env&gt;</code></li>
+<li>Run <code>make refresh deploy</code> in the testing environment</li>
+<li>Validate that all went well</li>
+<li>Lather, rinse repeat steps 2-3 as needed for the remaining sites to be updated. If you changed environment-level YAML files in step 1, those will also need to be replicated in each environment).</li>
+<li>Marvel at how much time you're saving in both updating YAML, fretting over whether you added all the properties correctly for each environment, and fixing/redeploying from any mistakes made along the way.</li>
+</ol></article><div class="footer_bg">
+<div class="wrap">
+	<div class="footer">
+		<div class="span_of_4">
+			<div class="span2_of_4">
+				<h2>Blog</h2>
+				<ul class="f_nav1">					<li><a href="/blog/standing-up-vault-using-genesis">Standing Up Vault Using Genesis</a></li>					<li><a href="/blog/using-genesis-to-deploy-cloud-foundry">Using Genesis to Deploy Cloud Foundry</a></li>					<li><a href="/blog/managing-multiple-bosh-environments-with-genesis">Managing Multiple BOSH Environments</a></li>				</ul>
+			</div>
+			<div class="span1_of_4">
+				<h2>Docs</h2>
+				<ul class="f_nav1">
+					<li><a href="/docs/getting-started">Getting Started</a></li>
+					<li><a href="/docs/faq">Why Genesis?</a></li>
+					<li><a href="/docs/runway">Pipelines &amp; Automation</a></li>
+				</ul>
+			</div>
+			<div class="span1_of_4">
+				<h2>Stark &amp; Wayne
+					<img src="/images/starkandwayne.png" style="float: right" /></h2>
+				<p class="f_para">
+					We provide world-class, top-tier consulting services
+					in deployment and automation of Cloud Foundry, Concourse and BOSH.
+				</p>
+			</div>
+			<div class="clear"></div>
+		</div>
+		<div class="footer_btm">
+		<div class="copy">
+			<p class="w3-link">Copyright 2016 <span><a href="https://starkandwayne.com">Stark & Wayne</a></span>.</p>
+		</div>
+		<div class="clear"></div>
+	</div>
+	</div>
+</div>
+</div>
+</body>
+</html>

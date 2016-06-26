@@ -1,0 +1,35 @@
+# vim:ft=markdown
+title: Managing Multiple BOSH Environments
+format: markdown
+permalink: managing-multiple-bosh-environments-with-genesis
+author: Geoff Franks
+featured: yes
+dated: 6 Jun 2016
+thumb: code
+--- |-
+Tame your BOSH deployment templates, and your many environments, using
+Genesis and its three-tiered architecture.  Geoff shows you how!
+--- |-
+If you've ever deployed Cloud Foundry via BOSH, you know how complicated BOSH's deployment manifests can be - thousands of lines, many properties, many of which are repeated. This problem gets compounded when you start to host multiple copies of your BOSH deployments, such as for a sandbox, preproduction, and prod environment. Many of these manifests will be mostly the same, and keeping track of the changes that need to propagate through each of these environments gets difficult. We have built [Genesis](https://github.com/starkandwayne/genesis) to attempt to alleviate a lot of these pain points.
+
+## What is Genesis?
+
+[Genesis](https://github.com/starkandwayne/genesis) is a new paradigm for deploying services via BOSH. Instead of dealing with complex and lengthy manifests, you deal with smaller templates, broken out into logical chunks. Many of these templates are shared amongst your environments, simplifying how changes get propagated from development through production.
+
+## Neat, how else can Genesis make my life easier?
+
+**It provides a common tooling interface** for working with and managing these deployments, whether it's using [bosh-init](https://github.com/cloudfoundry/bosh-init, the [micro BOSH plugin](https://github.com/cloudfoundry/bosh/tree/master/bosh_cli_plugin_micro), or [standard bosh](https://github.com/cloudfoundry/bosh) to deploy under the hood.
+
+**Pulling in upstream scaffolding for its templates**, allows you to get started even quicker by utilizing pre-created global/site templates for the BOSH releases you wish to deploy. Many of these are parameterized in a way that getting started with them is a matter of `make refresh manifest`, to find out what values you need to provide specific to each of your environments.
+
+**Custom env_hooks automate even more of the environment setup.** Your deployments can be taught to generate random credentials and store them in [Vault](https://vaultproject.io), or query an external datasource like terraform to pre-populate your networking configs with environment-specific infrastructure data.
+
+**The tight coupling with [Vault](https://vaultproject.io) keeps credentials, certificates, and keys secret and safe.** It retrieves credentials from Vault at deployment time, shoves them in a manifest for BOSH, and saves a redacted version of the manifest into the repo. The `genesis bosh` command can be used to perform any BOSH actions on your deployment which having a redacted manifest might inhibit.
+
+**Built-in [Concourse CI](https://conourse.ci) support for generating pipelines** to deploy all of your environments makes propagating changes from development through production a breeze.
+
+## I'm convinced. How do I get started?
+
+1. Take a look at the [Genesis](https://github.com/starkandwayne/genesis) repo for more detailed information.
+2. Grab the [latest executable](https://github.com/starkandwayne/genesis/releases).
+3. Go!

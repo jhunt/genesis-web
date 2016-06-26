@@ -1,0 +1,113 @@
+# vim:ft=markdown
+title: Using Genesis to Deploy Cloud Foundry
+format: markdown
+permalink: using-genesis-to-deploy-cloud-foundry
+author: Geoff Franks
+featured: yes
+dated: 8 Jun 2016
+thumb: cloud
+--- |-
+Here's how you can use Genesis to deploy Cloud Foundry, taking advantage of
+some of Genesis' features for generating per-environment credentials and
+storing them in Vault!
+--- |-
+In this post, we're going to use [Genesis](https://github.com/starkandwayne/genesis) to deploy [Cloud Foundry](https://github.com/cloudfoundry/cf-release). We will make use of some of Genesis's cool features to generate unique credentials for each deployment, and [Vault](https://vaultproject.io) to keep the credentials out of the saved manifests. We will do this on BOSH-Lite, but templates exist to easily deploy to AWS with a nearly identical process (AWS will require a couple more parameters to be defined).
+
+## Prerequisites
+
+These instructions assume that you have a working installation of [BOSH-Lite](https://github.com/cloudfoundry/bosh-lite), and [Vault](https://github.com/cloudfoundry-community/vault-boshrelease). It also assumes you have set the VAULT_ADDR environment variable, and successfully authenticated to an unsealed Vault. The [vault-boshrelease](https://github.com/cloudfoundry-community/vault-boshrelease) has some good instructions on getting this up and running quickly. Additionally, the [Spruce](https://github.com/geofffranks/spruce), [Safe](https://github.com/jhunt/safe), and [certstrap](https://github.com/square/certstrap) command line utilities are required.
+
+## Getting Started
+
+First, we will use Genesis to create a new repo for managing our Cloud Foundry deployments:
+
+    genesis new deployment --template cf
+
+This will create a git repository in the current working directory called `cf-deployments`. This repo will be what you use to manage all of your Cloud Foundry deployments, using the Genesis templates. An `upstream` remote is created automatically to track changes to the original templates, allowing you to easily pull in updates that are made to it over time.
+
+Secondly, we will create a new [site](https://github.com/starkandwayne/genesis#genesis---a-bosh-deployment-paradigm) for BOSH-Lite:
+
+    $ cd cf-deployments
+    $ genesis new site --template bosh-lite macbook
+
+This creates a new **site** directory in the `cf-deployments` repo, called `macbook`, based on the `bosh-lite` site templates. As of the time this post was written, both `bosh-lite` and `aws` site templates were provided, but more may now exist. If not, you can create your own, and hopefully submitting an upstream pull request, so others can make use of your work.
+
+Third, create a new [environment](https://github.com/starkandwayne/genesis#genesis---a-bosh-deployment-paradigm) in our `my-site` site:
+
+    genesis new environment my-site my-env
+
+This creates a `sandbox` directory representing the environment inside the `cf-deployments/macbook` site directory. It also does a couple nifty things under the hood that are not immediately apparent:
+
+1. It runs any scripts in `cf-deployments/.env_hooks`. In this case, there are scripts which will connect to your Vault installation and generate unique secrets/certificates/keys for your Cloud Foundry deployment. Each time you create a new environment, these credentials will be unique, decreasing the risks of environments accidentally communicating with one-another.
+2. It will generate a logical name for your bosh deployment, based on the type of deployment being done (cf), site (macbook), and environment (sandbox): `macbook-sandbox-cf`
+3. It grabs the UUID of the currently targeted BOSH director, and inserts that to `director.yml`, so you don't have to.
+
+Next, we will attempt to deploy, to see if there are any parameters need to be filled out to get our environment deployed:
+
+    $ cd macbook/sandbox
+    $ make deploy
+    Refreshing site definitions for macbook/sandbox
+    Refreshing global definitions for macbook/sandbox
+    4 error(s) detected:
+     - $.networks.cf.subnets: Specify the subnet to use for CF
+     - $.properties.cc.security_group_definitions.load_balancer.rules: Specify the rules for allowing access for CF apps to talk to the CF Load Balancer External IPs
+     - $.properties.cc.security_group_definitions.services.rules: Specify the rules for allowing access to CF services subnets
+     - $.properties.cc.security_group_definitions.user_bosh_deployments.rules: Specify the rules for additional BOSH user services that apps will need to talk to
+
+
+    Failed to merge templates; bailing...
+    make: *** [manifest] Error 5
+
+
+It looks like we need to provide some configuration for the network setup this Cloud Foundry will run on. Let's use this, to match what the traditional Cloud Foundry on BOSH-Lite will look like:
+
+    $ cat <<EOF > networking.yml
+    networks:
+    - name: cf
+      subnets:
+      - gateway: 10.244.0.1
+        range: 10.244.0.0/24
+        static:
+        - 10.244.0.2 - 10.244.0.100
+    
+    properties:
+      cc:
+        security_group_definitions:
+        - name: services
+          rules:
+          - destination: 10.244.0.0 - 10.244.1.255
+            protocol: all
+        - name: load_balancer
+          rules:
+          - destination: 10.244.0.34
+            protocol: all
+        - name: user_bosh_deployments
+          rules:
+          - destination: 10.244.0.0 - 10.244.255.255
+            protocol: all
+    EOF
+
+Now that that's taken care of, let's try again:
+
+    $ make refresh deploy
+    Refreshing site definitions for macbook/sandbox
+    Refreshing global definitions for macbook/sandbox
+    <output omitted for brevity - it's deploying a full CF to bosh-lite, after all>
+
+Since there were no errors generating the manifest, Genesis moves on to deploying Cloud Foundry. Now take a look at the generated manifest in `cf-deployments/macbook/sandbox/manifests/manifest.yml`, and look for the certs and passwords. You will see that they're all `REDACTED`. Genesis tells Spruce to redact credentials from Vault except in the manifest that is actively being deployed via BOSH (which is cleaned up immediately after). This greatly minimizes the risk that sensitive credentials might be committed into your repo, and accidentally leaked to unauthorized eyes.
+
+To find the credentials that were generated for the deployment, you can use `safe tree secret/macbook/sandbox/cf` to see where the creds are stored and `safe get <path>` to retrieve them for use with `cf login` or `nats`
+
+Finally, shout out to `@starkandwayne` with the `#genesis` hashtag to let us know you love genesis!
+
+## The Long Term Scenario
+
+When living with this in a real world scenario, you will inevitably need to make modifications and upgrades over time and across a variety of environments. Genesis makes this really easy to manage, since the global and site templates are shared across all your deployments. Many changes you make will go from `write-once-per-deployment-hoping-you-applied-all-the-changes-correctly, deploy-many` to `write-once, deploy-many`.
+
+The workflow goes something like this:
+
+1. Edit the applicable files in `cf-deployments/global`, `cf-deployments/<site>/site` or `cf-deployments/<site>/<env>`
+2. Run `make refresh deploy` in the testing environment
+3. Validate that all went well
+4. Lather, rinse repeat steps 2-3 as needed for the remaining sites to be updated. If you changed environment-level YAML files in step 1, those will also need to be replicated in each environment).
+5. Marvel at how much time you're saving in both updating YAML, fretting over whether you added all the properties correctly for each environment, and fixing/redeploying from any mistakes made along the way.

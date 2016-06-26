@@ -1,0 +1,210 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Genesis :: A BOSH Deployment Paradigm :: Stark &amp; Wayne</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" type="text/css">
+<link href="/css/style.css" rel="stylesheet" type="text/css" media="all" />
+<!--start slider -->
+    <link rel="stylesheet" href="/css/fwslider.css" media="all">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery-ui.min.js"></script>
+    <script src="/js/css3-mediaqueries.js"></script>
+    <script src="/js/fwslider.js"></script>
+<!--end slider -->
+<script type="text/javascript" src="/js/jquery-hover-effect.js"></script>
+<script type="text/javascript">
+//Image Hover
+jQuery(document).ready(function(){
+	jQuery(function() {
+		jQuery('ul.da-thumbs > li').hoverdir();
+	});
+});
+<!--nav-->
+<script type="text/javascript">
+	$(function() {
+		var pull 		= $('#pull');
+			menu 		= $('nav ul');
+			menuHeight	= menu.height();
+
+		$(pull).on('click', function(e) {
+			e.preventDefault();
+			menu.slideToggle();
+		});
+
+		$(window).resize(function(){
+			var w = $(window).width();
+			if(w > 320 && menu.is(':hidden')) {
+				menu.removeAttr('style');
+			}
+		});
+	});
+</script>
+</head>
+<body>
+<div class="header_bg">
+	<div class="wrap">
+		<div class="header">
+			<div class="logo">
+				<a href="/"><img src="/images/logo.png" alt="" /></a>
+			</div>
+			<div class="cssmenu">
+				<ul>
+					<li class="active"><a href="/">Home</a></li>
+					<li><a href="/docs">Documentation</a></li>
+					<li><a href="https://github.com/starkandwayne/genesis">Code</a></li>
+					<li class="last"><a href="starkandwayne.html">Stark &amp; Wayne</a></li>
+					<div class="clear"></div>
+				</ul>
+			</div>
+			<div class="clear"></div>
+			<div class="top-nav">
+				<nav class="clearfix">
+					<ul>
+						<li><a href="/">Home</a></li>
+						<li><a href="/docs">Documentation</a></li>
+						<li><a href="https://github.com/starkandwayne/genesis">Code</a></li>
+						<li class="last"><a href="starkandwayne.html">Stark &amp; Wayne</a></li>
+					</ul>
+					<a href="#" id="pull">Menu</a>
+				</nav>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+</div><!-- Slider -->
+<div id="fwslider">
+	<div class="slider_container">
+		<div class="slide">
+			<img src="/images/slider1.jpg">
+			<div class="slide_content">
+				<div class="slide_content_wrap">
+					<h4 class="title">BOSH. Easy.</h4>
+					<p class="description">Get your BOSH deployments up and spinning today.</p>
+				</div>
+			</div>
+		</div>
+		<div class="slide">
+			<img src="/images/slider2.jpg">
+			<div class="slide_content">
+				<div class="slide_content_wrap">
+					<h4 class="title">Let's Begin</h4>
+					<p class="description">Learn how Genesis can help you tame your multi-environment BOSH deployments.</p>
+				</div>
+			</div>
+		</div>
+		<!--/slide -->
+	</div>
+	<div class="timers"></div>
+	<div class="slidePrev"><span></span></div>
+	<div class="slideNext"><span></span></div>
+</div>
+
+
+<!-- 3-Column Teaser -->
+<div class="main_bg">
+	<div class="wrap">
+		<div class="grids_1_of_3">
+			<div class="grid_1_of_3 images_1_of_3">
+				<img src="/images/icon1.png" alt="" />
+				<a href="#"><h3>flexibility</h3></a>
+				<p>Leveraging <a href="https://spruce.cf">Spruce</a>, Genesis affords you and your operations team unprecedented flexibility in tailoring environment-specific configuration, while still being able to rely on a base of best practices.</p>
+			</div>
+			<div class="grid_1_of_3 images_1_of_3">
+				<img src="/images/icon2.png" alt="" />
+				<a href="#"><h3>cloud-native</h3></a>
+				<p>Genesis grew up on The Cloud&trade; and knows how things work in this new world order.  It comes with templates for deploying BOSH, Cloud Foundry, Diego, CF Service Brokers and more.</p>
+			</div>
+			<div class="grid_1_of_3 images_1_of_3">
+				<img src="/images/icon3.png" alt="" />
+				<a href="#"><h3>automation</h3></a>
+				<p>Using <a href="https://concourse-ci.com">Concourse</a>, Genesis can build automation workflows and pipelines to deploy configuration changes and security patches to all of your environments, in a controlled and tested fashion.</p>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+</div>
+
+
+<!-- Recent Blog Posts -->
+<div class="btm_grid_bg">
+	<div class="wrap">
+		<div class="btm_grid">
+			<h2>Recent Blog Posts</h2>
+			<div class="span_of_3">				<div class="span1_of_3">
+					<!-- 390x200 -->
+					<a href="/blog/standing-up-vault-using-genesis"><img src="/content/blog/keys.jpg" alt=""/></a>
+					<a href="/blog/standing-up-vault-using-genesis"><h3>Standing Up Vault Using Genesis</h3></a>
+					<h4 class="divider"></h4><p>Genesis BOSH deployments often require a Vault in which to safely store
+credentials.  Vault has a BOSH release, which now has a Genesis template to
+make getting up and running smoother than ever!</p>				</div>				<div class="span1_of_3">
+					<!-- 390x200 -->
+					<a href="/blog/using-genesis-to-deploy-cloud-foundry"><img src="/content/blog/cloud.jpg" alt=""/></a>
+					<a href="/blog/using-genesis-to-deploy-cloud-foundry"><h3>Using Genesis to Deploy Cloud Foundry</h3></a>
+					<h4 class="divider"></h4><p>Here's how you can use Genesis to deploy Cloud Foundry, taking advantage of
+some of Genesis' features for generating per-environment credentials and
+storing them in Vault!</p>				</div>				<div class="span1_of_3">
+					<!-- 390x200 -->
+					<a href="/blog/managing-multiple-bosh-environments-with-genesis"><img src="/content/blog/code.jpg" alt=""/></a>
+					<a href="/blog/managing-multiple-bosh-environments-with-genesis"><h3>Managing Multiple BOSH Environments</h3></a>
+					<h4 class="divider"></h4><p>Tame your BOSH deployment templates, and your many environments, using
+Genesis and its three-tiered architecture.  Geoff shows you how!</p>				</div>				<div class="clear"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- Trailer Teaser -->
+<div class="mid_grid_bg">
+	<div class="wrap">
+		<div class="mid_grid">
+			<div class="mid_grid_left">
+				<h2>Got a BOSH-lite and 10 minutes?</h2>
+				<h3>you too can get started with genesis!</h3>
+				<a href="/docs/getting-started" class="btn">get started</a>
+			</div>
+			<div class="mid_grid_right">
+				<img src="/images/banner.jpg" alt=""/>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+</div><div class="footer_bg">
+<div class="wrap">
+	<div class="footer">
+		<div class="span_of_4">
+			<div class="span2_of_4">
+				<h2>Blog</h2>
+				<ul class="f_nav1">					<li><a href="/blog/standing-up-vault-using-genesis">Standing Up Vault Using Genesis</a></li>					<li><a href="/blog/using-genesis-to-deploy-cloud-foundry">Using Genesis to Deploy Cloud Foundry</a></li>					<li><a href="/blog/managing-multiple-bosh-environments-with-genesis">Managing Multiple BOSH Environments</a></li>				</ul>
+			</div>
+			<div class="span1_of_4">
+				<h2>Docs</h2>
+				<ul class="f_nav1">
+					<li><a href="/docs/getting-started">Getting Started</a></li>
+					<li><a href="/docs/faq">Why Genesis?</a></li>
+					<li><a href="/docs/runway">Pipelines &amp; Automation</a></li>
+				</ul>
+			</div>
+			<div class="span1_of_4">
+				<h2>Stark &amp; Wayne
+					<img src="/images/starkandwayne.png" style="float: right" /></h2>
+				<p class="f_para">
+					We provide world-class, top-tier consulting services
+					in deployment and automation of Cloud Foundry, Concourse and BOSH.
+				</p>
+			</div>
+			<div class="clear"></div>
+		</div>
+		<div class="footer_btm">
+		<div class="copy">
+			<p class="w3-link">Copyright 2016 <span><a href="https://starkandwayne.com">Stark & Wayne</a></span>.</p>
+		</div>
+		<div class="clear"></div>
+	</div>
+	</div>
+</div>
+</div>
+</body>
+</html>

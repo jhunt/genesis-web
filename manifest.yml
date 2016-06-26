@@ -1,0 +1,10 @@
+applications:
+- name: website
+  instances: 1
+  memory: 64M
+  disk_quota: 1024M
+  host: genesis-web
+  domain: starkandwayne.com
+  buildpack: staticfile_buildpack
+  stack: cflinuxfs2
+  path: htdocs
