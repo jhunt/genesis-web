@@ -83,16 +83,16 @@ jQuery(document).ready(function(){
 				<h2>Blog</h2>
 				<ul class="f_nav1">
 					[% FOR post IN featured %]
-					<li><a href="[% site.url %]/blog/[% post.attrs.permalink %]">[% post.attrs.title %]</a></li>
+					<li><a href="[% site.url %]/blog/[% post.attrs.permalink %].html">[% post.attrs.title %]</a></li>
 					[% END %]
 				</ul>
 			</div>
 			<div class="span1_of_4">
 				<h2>Docs</h2>
 				<ul class="f_nav1">
-					<li><a href="/docs/getting-started">Getting Started</a></li>
-					<li><a href="/docs/faq">Why Genesis?</a></li>
-					<li><a href="/docs/runway">Pipelines &amp; Automation</a></li>
+					<li><a href="/docs/getting-started.html">Getting Started</a></li>
+					<li><a href="/docs/faq.html">Why Genesis?</a></li>
+					<li><a href="/docs/runway.html">Pipelines &amp; Automation</a></li>
 				</ul>
 			</div>
 			<div class="span1_of_4">

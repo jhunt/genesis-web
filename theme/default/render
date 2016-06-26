@@ -37,7 +37,7 @@ dir "{site}/blog";
 for my $post (@all) {
 	render [$post, { featured => [@featured] }],
 		using => "article.tt",
-		at    => "{site}/blog/{permalink}";
+		at    => "{site}/blog/{permalink}.html";
 }
 
 for my $page (page->read_all) {

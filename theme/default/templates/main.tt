@@ -62,8 +62,8 @@
 				[% LAST if article.index() == 3 %]
 				<div class="span1_of_3">
 					<!-- 390x200 -->
-					<a href="[% site.url %]/blog/[% article.uuid %]"><img src="[% site.url %]/content/blog/[% article.attrs.thumb %].jpg" alt=""/></a>
-					<a href="[% site.url %]/blog/[% article.uuid %]"><h3>[% article.attrs.title %]</h3></a>
+					<a href="[% site.url %]/blog/[% article.uuid %].html"><img src="[% site.url %]/content/blog/[% article.attrs.thumb %].jpg" alt=""/></a>
+					<a href="[% site.url %]/blog/[% article.uuid %].html"><h3>[% article.attrs.title %]</h3></a>
 					<h4 class="divider"></h4>
 					[% article.attrs.teaser %]
 				</div>
@@ -82,7 +82,7 @@
 			<div class="mid_grid_left">
 				<h2>Got a BOSH-lite and 10 minutes?</h2>
 				<h3>you too can get started with genesis!</h3>
-				<a href="/docs/getting-started" class="btn">get started</a>
+				<a href="/docs/getting-started.html" class="btn">get started</a>
 			</div>
 			<div class="mid_grid_right">
 				<img src="[% site.url %]/images/banner.jpg" alt=""/>

@@ -10,8 +10,8 @@
   <generator uri="http://verse.jameshunt.us/">Verse</generator>
 <entry>
     <title><![CDATA[Standing Up Vault Using Genesis]]></title>
-    <link href="/writings/standing-up-vault-using-genesis.html?rss" />
-    <id>/writings/standing-up-vault-using-genesis.html</id>
+    <link href="/blog/standing-up-vault-using-genesis.html?rss" />
+    <id>/blog/standing-up-vault-using-genesis.html</id>
     <updated>2016-06-21T00:00:00</updated>
     <content type="html"><![CDATA[<p>A few of our recent posts related to standing up BOSH deployments using <a href="https://github.com/starkandwayne/genesis">Genesis</a> have all revolved around needing <a href="https://vaultproject.io">Vault</a> to store your credentials safely. The <a href="https://github.com/cloudfoundry-community/vault-boshrelease">vault-boshrelease</a> makes this fairly straightforward, but there's now a <a href="https://github.com/starkandwayne/vault-deployment">Genesis Vault template</a> to make running Vault even easier!</p>
 
@@ -64,8 +64,8 @@ initialized: "true"
 <p>Voila!</p>]]></content>
   </entry>  <entry>
     <title><![CDATA[Using Genesis to Deploy Cloud Foundry]]></title>
-    <link href="/writings/using-genesis-to-deploy-cloud-foundry.html?rss" />
-    <id>/writings/using-genesis-to-deploy-cloud-foundry.html</id>
+    <link href="/blog/using-genesis-to-deploy-cloud-foundry.html?rss" />
+    <id>/blog/using-genesis-to-deploy-cloud-foundry.html</id>
     <updated>2016-06-08T00:00:00</updated>
     <content type="html"><![CDATA[<p>In this post, we're going to use <a href="https://github.com/starkandwayne/genesis">Genesis</a> to deploy <a href="https://github.com/cloudfoundry/cf-release">Cloud Foundry</a>. We will make use of some of Genesis's cool features to generate unique credentials for each deployment, and <a href="https://vaultproject.io">Vault</a> to keep the credentials out of the saved manifests. We will do this on BOSH-Lite, but templates exist to easily deploy to AWS with a nearly identical process (AWS will require a couple more parameters to be defined).</p>
 
@@ -178,8 +178,8 @@ Refreshing global definitions for macbook/sandbox
 </ol>]]></content>
   </entry>  <entry>
     <title><![CDATA[Managing Multiple BOSH Environments]]></title>
-    <link href="/writings/managing-multiple-bosh-environments-with-genesis.html?rss" />
-    <id>/writings/managing-multiple-bosh-environments-with-genesis.html</id>
+    <link href="/blog/managing-multiple-bosh-environments-with-genesis.html?rss" />
+    <id>/blog/managing-multiple-bosh-environments-with-genesis.html</id>
     <updated>2016-06-06T00:00:00</updated>
     <content type="html"><![CDATA[<p>If you've ever deployed Cloud Foundry via BOSH, you know how complicated BOSH's deployment manifests can be - thousands of lines, many properties, many of which are repeated. This problem gets compounded when you start to host multiple copies of your BOSH deployments, such as for a sandbox, preproduction, and prod environment. Many of these manifests will be mostly the same, and keeping track of the changes that need to propagate through each of these environments gets difficult. We have built <a href="https://github.com/starkandwayne/genesis">Genesis</a> to attempt to alleviate a lot of these pain points.</p>
 
