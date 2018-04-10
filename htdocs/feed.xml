@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title></title>
-  <link href="/rss.xml" rel="self" />
-  <link href="" />
+  <title>Genesis :: A BOSH Deployment Paradirm</title>
+  <link href="http://genesis.starkandwayne.com/rss.xml" rel="self" />
+  <link href="http://genesis.starkandwayne.com" />
 
   <updated>2016-06-21T00:00:00</updated>
-  <id></id>
-  <author><name></name></author>
+  <id>http://genesis.starkandwayne.com</id>
+  <author><name>James Hunt</name></author>
   <generator uri="http://verse.jameshunt.us/">Verse</generator>
 <entry>
     <title><![CDATA[Standing Up Vault Using Genesis]]></title>
